@@ -1,0 +1,12 @@
+<ul class="project-list">
+{% for project in site.projects %}
+  <li>
+    <a href="{{ project.url | relative_url }}">
+      <strong>{{ project.title }}</strong>
+    </a>
+    {% if project.description %}
+      <p>{{ project.description }}</p>
+    {% endif %}
+  </li>
+{% endfor %}
+</ul>

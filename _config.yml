@@ -1,26 +1,46 @@
 title: Ferran Ramia
 description: Portfolio de Data Engineering y análisis aplicado con Python / Power BI
-baseurl: "" 
+baseurl: ""
 url: "https://feramia.github.io"
 
-theme: minimal-mistakes-jekyll
+# GitHub Pages compatible theme
+remote_theme: mmistakes/minimal-mistakes@4.24.0
 
 plugins:
   - jekyll-feed
   - jekyll-seo-tag
   - jekyll-sitemap
+  - jekyll-include-cache
 
+# Collections
+collections:
+  projects:
+    output: true
+    permalink: /projects/:name/
+
+# Defaults
 defaults:
-  -
-    scope:
+  - scope:
       path: ""
       type: "pages"
     values:
       layout: "single"
-  -
-    scope:
+  - scope:
       path: ""
       type: "projects"
     values:
-      layout: "project"
+      layout: "single"
 
+# Minimal Mistakes settings
+minimal_mistakes_skin: "default"
+locale: "es-ES"
+repository: "FeRamia/feramia.github.io"
+
+author:
+  name: "Ferran Ramia"
+  bio: "Data Engineer & Analyst"
+  location: "Spain"
+  links:
+    - label: "GitHub"
+      icon: "fab fa-fw fa-github"
+      url: "https://github.com/FeRamia"

@@ -1,13 +1,15 @@
 ---
-title: "Hola 👋"
-layout: home
+title: "Hola"
+layout: single
+author_profile: true
 ---
 
-Soy **ingeniero informático** con 5+ años de experiencia full-stack, enfocado en:
-- 📊 Análisis de datos
-- 🤖 Simulación estadística
-- 🚀 Visualización con Power BI
-- 🐍 Python + DuckDB
+Soy **ingeniero informatico** con 5+ anos de experiencia full-stack, enfocado en:
+
+- Analisis de datos
+- Simulacion estadistica
+- Visualizacion con Power BI
+- Python + DuckDB
 
 ## Proyectos recientes
 
