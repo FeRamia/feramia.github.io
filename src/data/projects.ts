@@ -1,6 +1,5 @@
 // Proyectos mostrados en la sección "Proyectos".
 // Para añadir uno: copia un objeto, rellena los campos y guarda. El orden del array es el orden en la web.
-// También puedes pedírselo a Claude Code con el subagente "project-curator".
 import type { Localized } from './profile';
 
 export type ProjectCategory = 'fullstack' | 'data' | 'ai' | 'automation';

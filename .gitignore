@@ -5,11 +5,3 @@ dist/
 .env.*
 !.env.example
 .DS_Store
-
-# CV y notas locales (no publicar)
-/CV-*.pdf
-Etiqueta de Google.txt
-
-# Solo local
-README.md
-.claude/
