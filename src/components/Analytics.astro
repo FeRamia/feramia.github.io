@@ -1,0 +1,103 @@
+---
+// Google Analytics 4 con Consent Mode v2 + banner de cookies (RGPD/LSSI).
+// - El ID se lee de PUBLIC_GA_ID (.env). Si no está definido, no se carga nada.
+// - Por defecto el consentimiento está denegado; GA solo guarda cookies si el visitante acepta.
+// - Eventos personalizados: cualquier elemento con data-track="nombre_evento" envía ese evento al hacer clic
+//   (con data-track-label opcional como parámetro "label").
+import type { Lang } from '../data/profile';
+import { useTranslations } from '../i18n/ui';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const GA_ID = import.meta.env.PUBLIC_GA_ID;
+---
+
+{GA_ID && (
+  <>
+    <script is:inline define:vars={{ GA_ID }}>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+      window.gtag = gtag;
+      var stored = null;
+      try { stored = localStorage.getItem('cookie-consent'); } catch (e) {}
+      gtag('consent', 'default', {
+        ad_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied',
+        analytics_storage: stored === 'granted' ? 'granted' : 'denied',
+        wait_for_update: 500,
+      });
+      gtag('js', new Date());
+      gtag('config', GA_ID, { anonymize_ip: true });
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
+      document.head.appendChild(s);
+    </script>
+
+    <div
+      id="cookie-banner"
+      role="dialog"
+      aria-live="polite"
+      aria-label="Cookies"
+      hidden
+      class="fixed inset-x-4 bottom-4 z-50 mx-auto max-w-xl rounded-2xl border border-line bg-card p-5 shadow-2xl"
+    >
+      <p class="text-sm text-muted">{t('cookies.text')}</p>
+      <div class="mt-4 flex justify-end gap-3">
+        <button data-consent="denied" class="rounded-lg border border-line px-4 py-2 text-sm font-medium hover:bg-bg-soft">
+          {t('cookies.reject')}
+        </button>
+        <button data-consent="granted" class="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-fg hover:opacity-90">
+          {t('cookies.accept')}
+        </button>
+      </div>
+    </div>
+
+    <script>
+      const banner = document.getElementById('cookie-banner');
+      const read = () => { try { return localStorage.getItem('cookie-consent'); } catch { return null; } };
+      const save = (v: string) => { try { localStorage.setItem('cookie-consent', v); } catch {} };
+
+      if (banner && !read()) banner.hidden = false;
+
+      banner?.querySelectorAll<HTMLButtonElement>('[data-consent]').forEach((btn) =>
+        btn.addEventListener('click', () => {
+          const value = btn.dataset.consent!;
+          save(value);
+          window.gtag?.('consent', 'update', { analytics_storage: value });
+          banner.hidden = true;
+        }),
+      );
+
+      // Enlace del footer para reabrir el banner
+      document.querySelectorAll('[data-open-cookies]').forEach((el) =>
+        el.addEventListener('click', (e) => { e.preventDefault(); if (banner) banner.hidden = false; }),
+      );
+
+      // Seguimiento de clics: <a data-track="cv_download" data-track-label="hero">
+      document.addEventListener('click', (e) => {
+        const el = (e.target as HTMLElement).closest<HTMLElement>('[data-track]');
+        if (!el) return;
+        window.gtag?.('event', el.dataset.track!, {
+          label: el.dataset.trackLabel,
+          link_url: (el as HTMLAnchorElement).href,
+        });
+      });
+
+      // Secciones vistas: section_view una vez por sección
+      const seen = new Set<string>();
+      const io = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          const id = (entry.target as HTMLElement).id;
+          if (entry.isIntersecting && !seen.has(id)) {
+            seen.add(id);
+            window.gtag?.('event', 'section_view', { section: id });
+          }
+        }
+      }, { threshold: 0.4 });
+      document.querySelectorAll('main section[id]').forEach((s) => io.observe(s));
+    </script>
+  </>
+)}

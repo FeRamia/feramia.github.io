@@ -1,0 +1,95 @@
+---
+import Icon from './Icon.astro';
+import { profile, yearsOfExperience, type Lang } from '../data/profile';
+import { useTranslations } from '../i18n/ui';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const stats = [
+  [`${yearsOfExperience}+`, t('stats.years')],
+  ['MSc', t('stats.master')],
+  ['360°', t('stats.profile')],
+];
+---
+
+<section class="relative overflow-hidden">
+  <div
+    class="pointer-events-none absolute -top-32 right-0 h-[28rem] w-[28rem] rounded-full opacity-20 blur-3xl"
+    style="background: radial-gradient(circle, var(--accent), transparent 70%)"
+  ></div>
+  <div
+    class="pointer-events-none absolute -bottom-40 -left-20 h-[24rem] w-[24rem] rounded-full opacity-15 blur-3xl"
+    style="background: radial-gradient(circle, var(--accent-2), transparent 70%)"
+  ></div>
+
+  <div class="relative mx-auto grid max-w-6xl items-center gap-12 px-4 py-20 sm:px-6 md:grid-cols-[1.4fr_1fr] md:py-28">
+    <div>
+      <p class="inline-flex items-center gap-2 rounded-full border border-line bg-card px-3 py-1 text-xs text-muted">
+        <span class="h-2 w-2 animate-pulse rounded-full bg-emerald-500"></span>
+        {t('hero.available')}
+      </p>
+      <h1 class="mt-6 text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
+        {profile.name}
+      </h1>
+      <p class="mt-3 text-xl font-semibold sm:text-2xl">
+        <span class="gradient-text">{profile.headline[lang]}</span>
+      </p>
+      <p class="mt-2 font-mono text-sm text-muted">{profile.role[lang]} · {profile.location[lang]}</p>
+      <p class="mt-6 max-w-xl text-lg text-muted">{profile.tagline[lang]}</p>
+
+      <div class="mt-8 flex flex-wrap gap-3">
+        <a href="#projects" class="inline-flex items-center gap-2 rounded-lg bg-accent px-5 py-3 font-semibold text-accent-fg shadow-lg shadow-accent/20 transition hover:-translate-y-0.5">
+          {t('hero.cta.projects')} <Icon name="arrow" class="h-4 w-4" />
+        </a>
+        {profile.cv ? (
+          <a
+            href={profile.cv}
+            download
+            data-track="cv_download"
+            data-track-label="hero"
+            class="inline-flex items-center gap-2 rounded-lg border border-line bg-card px-5 py-3 font-semibold transition hover:border-accent hover:text-accent"
+          >
+            <Icon name="download" class="h-4 w-4" /> {t('hero.cta.cv')}
+          </a>
+        ) : (
+          <a
+            href="#contact"
+            class="inline-flex items-center gap-2 rounded-lg border border-line bg-card px-5 py-3 font-semibold transition hover:border-accent hover:text-accent"
+          >
+            <Icon name="mail" class="h-4 w-4" /> {t('hero.cta.contact')}
+          </a>
+        )}
+        {profile.cv && (
+          <a href="#contact" class="inline-flex items-center gap-2 px-3 py-3 font-semibold text-muted hover:text-fg">
+            {t('hero.cta.contact')}
+          </a>
+        )}
+      </div>
+
+      <dl class="mt-12 grid max-w-md grid-cols-3 gap-6">
+        {stats.map(([value, label]) => (
+          <div>
+            <dt class="sr-only">{label}</dt>
+            <dd class="text-2xl font-bold">{value}</dd>
+            <dd class="text-xs text-muted">{label}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+
+    <div class="mx-auto">
+      <div class="relative">
+        <div class="absolute -inset-1 rounded-[2rem] bg-gradient-to-br from-accent to-accent-2 opacity-70 blur"></div>
+        <img
+          src={profile.photo}
+          alt={profile.name}
+          width="205"
+          height="234"
+          class="relative h-64 w-56 rounded-[2rem] border border-line object-cover sm:h-72 sm:w-64"
+        />
+      </div>
+    </div>
+  </div>
+</section>

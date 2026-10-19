@@ -1,0 +1,97 @@
+---
+import Icon from './Icon.astro';
+import Section from './Section.astro';
+import { projects, type ProjectCategory } from '../data/projects';
+import type { Lang } from '../data/profile';
+import { useTranslations } from '../i18n/ui';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const sorted = [...projects].sort((a, b) => Number(!!b.featured) - Number(!!a.featured));
+const categories = ['fullstack', 'data', 'ai', 'automation'].filter((c) =>
+  projects.some((p) => p.category === c),
+) as ProjectCategory[];
+---
+
+<Section id="projects" eyebrow="05" title={t('projects.title')} subtitle={t('projects.subtitle')}>
+  {categories.length > 1 && (
+    <div class="reveal mb-8 flex flex-wrap gap-2" role="tablist">
+      <button class="filter-btn is-active" data-filter="all">{t('projects.filter.all')}</button>
+      {categories.map((c) => (
+        <button class="filter-btn" data-filter={c}>{t(`projects.filter.${c}`)}</button>
+      ))}
+    </div>
+  )}
+
+  <div class="grid gap-6 md:grid-cols-2">
+    {sorted.map((p) => (
+      <article
+        data-category={p.category}
+        class="project-card reveal group flex flex-col overflow-hidden rounded-2xl border border-line bg-card transition hover:-translate-y-1 hover:border-accent/60 hover:shadow-xl"
+      >
+        {p.image ? (
+          <img src={p.image} alt={p.title} loading="lazy" class="aspect-video w-full object-cover" />
+        ) : (
+          <div class="flex aspect-[3/1] items-center justify-center bg-gradient-to-br from-accent/15 to-accent-2/15 text-accent">
+            <Icon name={{ fullstack: 'code', data: 'chart', ai: 'cap', automation: 'bolt' }[p.category]} class="h-10 w-10" />
+          </div>
+        )}
+        <div class="flex flex-1 flex-col p-6">
+          <div class="flex items-center gap-2">
+            <span class="font-mono text-xs uppercase text-accent">{t(`projects.filter.${p.category}`)}</span>
+            {p.featured && (
+              <span class="rounded-full bg-accent-2/15 px-2 py-0.5 text-xs font-medium text-accent-2">{t('projects.featured')}</span>
+            )}
+          </div>
+          <h3 class="mt-2 text-xl font-semibold">{p.title}</h3>
+          <p class="mt-3 flex-1 text-sm leading-relaxed text-muted">{p.description[lang]}</p>
+          <ul class="mt-4 flex flex-wrap gap-2">
+            {p.tags.map((tag) => <li class="rounded-md bg-bg-soft px-2 py-1 font-mono text-xs text-muted">{tag}</li>)}
+          </ul>
+          {(p.repo || p.demo) && (
+            <div class="mt-5 flex gap-4 text-sm font-medium">
+              {p.repo && (
+                <a href={p.repo} target="_blank" rel="noopener" data-track="project_click" data-track-label={`${p.title} · repo`} class="inline-flex items-center gap-1.5 hover:text-accent">
+                  <Icon name="github" class="h-4 w-4" /> {t('projects.code')}
+                </a>
+              )}
+              {p.demo && (
+                <a href={p.demo} target="_blank" rel="noopener" data-track="project_click" data-track-label={`${p.title} · demo`} class="inline-flex items-center gap-1.5 hover:text-accent">
+                  <Icon name="external" class="h-4 w-4" /> {t('projects.demo')}
+                </a>
+              )}
+            </div>
+          )}
+        </div>
+      </article>
+    ))}
+  </div>
+</Section>
+
+<style>
+  .filter-btn {
+    border: 1px solid var(--line);
+    border-radius: 9999px;
+    padding: 0.4rem 0.9rem;
+    font-size: 0.875rem;
+    color: var(--muted);
+    transition: all 0.2s;
+  }
+  .filter-btn:hover { color: var(--fg); border-color: var(--accent); }
+  .filter-btn.is-active { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+</style>
+
+<script>
+  const buttons = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
+  const cards = document.querySelectorAll<HTMLElement>('.project-card');
+  buttons.forEach((btn) =>
+    btn.addEventListener('click', () => {
+      const f = btn.dataset.filter!;
+      buttons.forEach((b) => b.classList.toggle('is-active', b === btn));
+      cards.forEach((c) => { c.hidden = f !== 'all' && c.dataset.category !== f; });
+      window.gtag?.('event', 'project_filter', { filter: f });
+    }),
+  );
+</script>

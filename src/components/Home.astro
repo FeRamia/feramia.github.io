@@ -1,0 +1,143 @@
+---
+import Base from '../layouts/Base.astro';
+import Header from './Header.astro';
+import Hero from './Hero.astro';
+import Section from './Section.astro';
+import Projects from './Projects.astro';
+import Icon from './Icon.astro';
+import { profile, type Lang } from '../data/profile';
+import { useTranslations } from '../i18n/ui';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const year = new Date().getFullYear();
+---
+
+<Base lang={lang}>
+  <Header lang={lang} />
+  <main>
+    <Hero lang={lang} />
+
+    <!-- Sobre mí -->
+    <Section id="about" eyebrow="01" title={t('about.title')} soft>
+      <div class="grid gap-10 md:grid-cols-[2fr_1fr]">
+        <div class="reveal space-y-5 text-lg leading-relaxed text-muted">
+          {profile.about[lang].map((p) => <p>{p}</p>)}
+        </div>
+        <aside class="reveal space-y-6 rounded-2xl border border-line bg-card p-6">
+          <div>
+            <h3 class="flex items-center gap-2 text-sm font-semibold"><Icon name="pin" class="h-4 w-4 text-accent" />{t('about.location')}</h3>
+            <p class="mt-1 text-sm text-muted">{profile.location[lang]}</p>
+          </div>
+          <div>
+            <h3 class="flex items-center gap-2 text-sm font-semibold"><Icon name="globe" class="h-4 w-4 text-accent" />{t('about.languages')}</h3>
+            <ul class="mt-2 space-y-1 text-sm">
+              {profile.languages.map((l) => (
+                <li class="flex justify-between gap-4"><span>{l.name[lang]}</span><span class="text-muted">{l.level[lang]}</span></li>
+              ))}
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </Section>
+
+    <!-- Qué hago -->
+    <Section id="expertise" eyebrow="02" title={t('expertise.title')} subtitle={t('expertise.subtitle')}>
+      <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {profile.expertise.map((e) => (
+          <div class="reveal rounded-2xl border border-line bg-card p-6 transition hover:border-accent/60">
+            <div class="inline-flex rounded-xl bg-accent/10 p-3 text-accent"><Icon name={e.icon} class="h-6 w-6" /></div>
+            <h3 class="mt-4 text-lg font-semibold">{e.title[lang]}</h3>
+            <p class="mt-2 text-sm leading-relaxed text-muted">{e.text[lang]}</p>
+          </div>
+        ))}
+      </div>
+    </Section>
+
+    <!-- Experiencia + formación -->
+    <Section id="experience" eyebrow="03" title={t('experience.title')} soft>
+      <div class="grid gap-12 lg:grid-cols-[3fr_2fr]">
+        <ol class="space-y-8">
+          {profile.experience.map((job) => (
+            <li class="reveal relative border-l-2 border-accent/40 pl-6">
+              <span class="absolute -left-[9px] top-1 h-4 w-4 rounded-full border-4 border-bg-soft bg-accent"></span>
+              <p class="font-mono text-xs text-accent">{job.period[lang]}</p>
+              <h3 class="mt-1 text-xl font-semibold">{job.role[lang]}</h3>
+              <p class="text-muted">{job.company} · {job.location[lang]}</p>
+              <ul class="mt-4 space-y-2 text-sm leading-relaxed text-muted">
+                {job.bullets[lang].map((b) => (
+                  <li class="flex gap-2"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent"></span><span set:html={b} /></li>
+                ))}
+              </ul>
+            </li>
+          ))}
+        </ol>
+
+        <div class="reveal">
+          <h3 class="flex items-center gap-2 text-lg font-semibold"><Icon name="cap" class="h-5 w-5 text-accent" />{t('education.title')}</h3>
+          <ul class="mt-5 space-y-4">
+            {profile.education.map((e) => (
+              <li class="rounded-2xl border border-line bg-card p-5">
+                <p class="font-mono text-xs text-accent">{e.period[lang]}</p>
+                <p class="mt-1 font-semibold">{e.title[lang]}</p>
+                <p class="text-sm text-muted">{e.school}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </Section>
+
+    <!-- Stack -->
+    <Section id="skills" eyebrow="04" title={t('skills.title')}>
+      <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {profile.skills.map((s) => (
+          <div class="reveal rounded-2xl border border-line bg-card p-6">
+            <h3 class="font-semibold">{s.group[lang]}</h3>
+            <ul class="mt-4 flex flex-wrap gap-2">
+              {s.items.map((i) => <li class="rounded-md border border-line bg-bg-soft px-2.5 py-1 font-mono text-xs">{i}</li>)}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </Section>
+
+    <Projects lang={lang} />
+
+    <!-- Contacto -->
+    <section id="contact" class="py-20 sm:py-24">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+        <div class="reveal relative overflow-hidden rounded-3xl border border-line bg-card p-8 text-center sm:p-14">
+          <div class="pointer-events-none absolute inset-0 opacity-10" style="background: linear-gradient(135deg, var(--accent), var(--accent-2))"></div>
+          <p class="section-eyebrow relative">06</p>
+          <h2 class="relative mt-2 text-3xl font-bold tracking-tight sm:text-4xl">{t('contact.title')}</h2>
+          <p class="relative mx-auto mt-4 max-w-xl text-muted">{t('contact.text')}</p>
+          <div class="relative mt-8 flex flex-wrap justify-center gap-3">
+            <a href={`mailto:${profile.contact.email}`} data-track="contact_click" data-track-label="email" class="inline-flex items-center gap-2 rounded-lg bg-accent px-5 py-3 font-semibold text-accent-fg">
+              <Icon name="mail" class="h-4 w-4" /> {t('contact.email')}
+            </a>
+            <a href={profile.contact.linkedin} target="_blank" rel="noopener" data-track="contact_click" data-track-label="linkedin" class="inline-flex items-center gap-2 rounded-lg border border-line bg-bg px-5 py-3 font-semibold hover:border-accent hover:text-accent">
+              <Icon name="linkedin" class="h-4 w-4" /> LinkedIn
+            </a>
+            <a href={profile.contact.github} target="_blank" rel="noopener" data-track="contact_click" data-track-label="github" class="inline-flex items-center gap-2 rounded-lg border border-line bg-bg px-5 py-3 font-semibold hover:border-accent hover:text-accent">
+              <Icon name="github" class="h-4 w-4" /> GitHub
+            </a>
+            {profile.cv && (
+              <a href={profile.cv} download data-track="cv_download" data-track-label="contact" class="inline-flex items-center gap-2 rounded-lg border border-line bg-bg px-5 py-3 font-semibold hover:border-accent hover:text-accent">
+                <Icon name="download" class="h-4 w-4" /> CV
+              </a>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="border-t border-line py-8">
+    <div class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 text-sm text-muted sm:flex-row sm:px-6">
+      <p>© {year} {profile.name}. {t('footer.rights')}</p>
+      <a href="#" data-open-cookies class="hover:text-fg">{t('footer.cookies')}</a>
+    </div>
+  </footer>
+</Base>

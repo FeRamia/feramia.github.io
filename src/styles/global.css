@@ -1,0 +1,104 @@
+@import 'tailwindcss';
+
+/* Tema claro por defecto; el oscuro se aplica por preferencia del sistema o con el botón (data-theme). */
+:root {
+  --bg: #f7f8fa;
+  --bg-soft: #eef1f5;
+  --card: #ffffff;
+  --fg: #0f172a;
+  --muted: #526075;
+  --line: #dde3ea;
+  --accent: #0d9488;
+  --accent-2: #4f46e5;
+  --accent-fg: #ffffff;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #0b1120;
+    --bg-soft: #111a2e;
+    --card: #131d33;
+    --fg: #e6edf7;
+    --muted: #94a3b8;
+    --line: #22304a;
+    --accent: #2dd4bf;
+    --accent-2: #818cf8;
+    --accent-fg: #04201d;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme='dark'] {
+  --bg: #0b1120;
+  --bg-soft: #111a2e;
+  --card: #131d33;
+  --fg: #e6edf7;
+  --muted: #94a3b8;
+  --line: #22304a;
+  --accent: #2dd4bf;
+  --accent-2: #818cf8;
+  --accent-fg: #04201d;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-soft: var(--bg-soft);
+  --color-card: var(--card);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-2: var(--accent-2);
+  --color-accent-fg: var(--accent-fg);
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .reveal { opacity: 1 !important; transform: none !important; }
+}
+
+.gradient-text {
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.section-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+/* Sin JS, todo visible */
+.no-js .reveal { opacity: 1; transform: none; }
+
+/* El atributo hidden debe ganar a utilidades como flex/grid */
+[hidden] { display: none !important; }

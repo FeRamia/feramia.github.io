@@ -1,0 +1,83 @@
+---
+import '../styles/global.css';
+import Analytics from '../components/Analytics.astro';
+import { profile, type Lang } from '../data/profile';
+import { useTranslations } from '../i18n/ui';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const site = Astro.site ?? new URL('https://feramia.github.io');
+const esUrl = new URL('/', site).href;
+const enUrl = new URL('/en/', site).href;
+const canonical = lang === 'es' ? esUrl : enUrl;
+const ogImage = new URL(profile.photo, site).href;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: profile.name,
+  jobTitle: profile.headline[lang],
+  url: canonical,
+  image: ogImage,
+  address: { '@type': 'PostalAddress', addressLocality: 'Castellón de la Plana', addressCountry: 'ES' },
+  alumniOf: profile.education.map((e) => ({ '@type': 'CollegeOrUniversity', name: e.school })),
+  worksFor: { '@type': 'Organization', name: profile.experience[0].company },
+  knowsAbout: profile.skills.flatMap((s) => s.items),
+  sameAs: [profile.contact.linkedin, profile.contact.github],
+};
+---
+
+<!doctype html>
+<html lang={lang} class="no-js">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{t('meta.title')}</title>
+    <meta name="description" content={t('meta.description')} />
+    <meta name="author" content={profile.name} />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="es" href={esUrl} />
+    <link rel="alternate" hreflang="en" href={enUrl} />
+    <link rel="alternate" hreflang="x-default" href={esUrl} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <meta property="og:type" content="profile" />
+    <meta property="og:title" content={t('meta.title')} />
+    <meta property="og:description" content={t('meta.description')} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:locale" content={lang === 'es' ? 'es_ES' : 'en_US'} />
+    <meta name="twitter:card" content="summary" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap"
+      rel="stylesheet"
+    />
+
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+    <script is:inline>
+      document.documentElement.classList.remove('no-js');
+      try {
+        var theme = localStorage.getItem('theme');
+        if (theme) document.documentElement.dataset.theme = theme;
+      } catch (e) {}
+    </script>
+  </head>
+  <body class="min-h-screen">
+    <slot />
+    <Analytics lang={lang} />
+    <script>
+      const io = new IntersectionObserver(
+        (entries) => entries.forEach((e) => e.isIntersecting && (e.target.classList.add('is-visible'), io.unobserve(e.target))),
+        { threshold: 0.12 },
+      );
+      document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+    </script>
+  </body>
+</html>
